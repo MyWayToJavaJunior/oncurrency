@@ -1,7 +1,6 @@
-package me.vgv.oncurrency.provider;
+package me.vgv.oncurrency;
 
 import com.google.common.base.Preconditions;
-import me.vgv.oncurrency.Currency;
 
 import javax.annotation.Nonnull;
 
@@ -70,5 +69,15 @@ public final class CurrencyPair {
 		temp = secondRate != +0.0d ? Double.doubleToLongBits(secondRate) : 0L;
 		result = 31 * result + (int) (temp ^ (temp >>> 32));
 		return result;
+	}
+
+	@Override
+	public String toString() {
+		return "CurrencyPair{" +
+				"firstCurrency=" + firstCurrency +
+				", firstRate=" + firstRate +
+				", secondCurrency=" + secondCurrency +
+				", secondRate=" + secondRate +
+				'}';
 	}
 }

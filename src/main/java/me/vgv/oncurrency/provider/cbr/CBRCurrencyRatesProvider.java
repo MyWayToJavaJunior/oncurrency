@@ -1,7 +1,7 @@
 package me.vgv.oncurrency.provider.cbr;
 
 import me.vgv.oncurrency.Currency;
-import me.vgv.oncurrency.provider.CurrencyPair;
+import me.vgv.oncurrency.CurrencyPair;
 import me.vgv.oncurrency.provider.CurrencyRatesProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,8 +14,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Vasily Vasilkov (vgv@vgv.me)
@@ -51,7 +51,6 @@ public final class CBRCurrencyRatesProvider implements CurrencyRatesProvider {
 	}
 
 	protected CBRCurrencyList parseCurrencyList(String xml) {
-		CBRCurrencyList currencyList = null;
 		try {
 			Unmarshaller unmarshaller = JAXB_CONTEXT.createUnmarshaller();
 			return (CBRCurrencyList) unmarshaller.unmarshal(new StringReader(xml));
@@ -62,18 +61,23 @@ public final class CBRCurrencyRatesProvider implements CurrencyRatesProvider {
 
 	@Nonnull
 	@Override
-	public List<CurrencyPair> getCurrencyPairs() {
+	public Set<CurrencyPair> getCurrencyPairs() {
 		String xml = getXml();
 		CBRCurrencyList currencyList = parseCurrencyList(xml);
 
 		// CBR returns currency rates based on RUB
 		me.vgv.oncurrency.Currency baseCurrency = Currency.RUB;
 
-		List<CurrencyPair> result = new ArrayList<>();
+		Set<CurrencyPair> result = new HashSet<>();
 		for (CBRCurrency cbrCurrency : currencyList.getCurrencyList()) {
-			double nominal = cbrCurrency.getNominal();
-			Currency currency = Currency.valueOf(cbrCurrency.getCharCode());
+			Currency currency = Currency.findByCode(cbrCurrency.getCharCode());
+			if (currency == null) {
+				log.debug("Currency with code '" + cbrCurrency.getCharCode() + "' not found in Currency enum");
+				continue;
+			}
+
 			double rate = cbrCurrency.getValue();
+			double nominal = cbrCurrency.getNominal();
 
 			CurrencyPair currencyPair = new CurrencyPair(baseCurrency, nominal, currency, rate);
 			result.add(currencyPair);

@@ -1,7 +1,9 @@
 package me.vgv.oncurrency.provider;
 
+import me.vgv.oncurrency.CurrencyPair;
+
 import javax.annotation.Nonnull;
-import java.util.List;
+import java.util.Set;
 
 /**
  * @author Vasily Vasilkov (vgv@vgv.me)
@@ -9,6 +11,6 @@ import java.util.List;
 public interface CurrencyRatesProvider {
 
 	@Nonnull
-	public List<CurrencyPair> getCurrencyPairs();
+	public Set<CurrencyPair> getCurrencyPairs();
 
 }
