@@ -40,15 +40,15 @@
 				classpathref="test-compile-classpath"/>
 	</target>
 
-	<target name="jar" depends="compile">
+	<target name="package" depends="compile">
 		<jar basedir="output/classes" jarfile="dist/oncurrency.jar"/>
+		<jar basedir="src/main/java" jarfile="dist/oncurrency-sources.jar"/>
 	</target>
 
 	<target name="test" depends="compile-test">
 		<test-run/>
 	</target>
 
-	<target name="dist" depends="clean, jar">
-	</target>
+	<target name="dist" depends="clean, test, package"/>
 
 </project>
