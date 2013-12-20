@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 /**
  * @author Vasily Vasilkov (vgv@vgv.me)
  */
-class CBRCurrency {
+final class CBRCurrency {
 
 	//private String id;
 	//private String numCode;

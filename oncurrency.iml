@@ -8,7 +8,14 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="testng-6.8" level="project" />
+    <orderEntry type="library" exported="" name="guava-15.0" level="project" />
+    <orderEntry type="library" exported="" name="slf4j-api-1.6.6" level="project" />
+    <orderEntry type="library" scope="TEST" name="mockito-all-1.9.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="jcommander-1.27" level="project" />
+    <orderEntry type="library" scope="TEST" name="bsh-2.0b4" level="project" />
+    <orderEntry type="library" exported="" name="jsr305-2.0.1" level="project" />
+    <orderEntry type="library" exported="" name="gson-2.2.3" level="project" />
   </component>
 </module>
 

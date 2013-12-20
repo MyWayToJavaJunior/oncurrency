@@ -4,6 +4,14 @@
     <entry_points version="2.0" />
   </component>
   <component name="IdProvider" IDEtalkID="94193A93C12FF78BBBD50D880C579AAF" />
+  <component name="IvyIDEA.ProjectSettings">
+    <option name="artifactTypeSettings">
+      <ArtifactTypeSettings />
+    </option>
+    <option name="propertiesSettings">
+      <PropertiesSettings />
+    </option>
+  </component>
   <component name="ProjectResources">
     <default-html-doctype>http://www.w3.org/1999/xhtml</default-html-doctype>
   </component>

@@ -11,6 +11,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URL;
@@ -36,7 +37,7 @@ public final class CBRCurrencyRatesProvider implements CurrencyRatesProvider {
 		}
 	}
 
-	protected String getXml() {
+	protected String getXml() throws IOException {
 		try (InputStream inputStream = new URL(CBR_XML_URL).openStream()) {
 			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 			int readBytes;
@@ -45,42 +46,42 @@ public final class CBRCurrencyRatesProvider implements CurrencyRatesProvider {
 				byteArrayOutputStream.write(buffer, 0, readBytes);
 			}
 			return byteArrayOutputStream.toString("UTF-8");
-		} catch (Exception e) {
-			throw new RuntimeException(e);
 		}
 	}
 
-	protected CBRCurrencyList parseCurrencyList(String xml) {
-		try {
-			Unmarshaller unmarshaller = JAXB_CONTEXT.createUnmarshaller();
-			return (CBRCurrencyList) unmarshaller.unmarshal(new StringReader(xml));
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+	protected CBRCurrencyList parseCurrencyList(String xml) throws JAXBException {
+		Unmarshaller unmarshaller = JAXB_CONTEXT.createUnmarshaller();
+		return (CBRCurrencyList) unmarshaller.unmarshal(new StringReader(xml));
 	}
 
 	@Nonnull
 	@Override
 	public Set<CurrencyPair> getCurrencyPairs() {
-		String xml = getXml();
-		CBRCurrencyList currencyList = parseCurrencyList(xml);
-
-		// CBR returns currency rates based on RUB
-		me.vgv.oncurrency.Currency baseCurrency = Currency.RUB;
-
 		Set<CurrencyPair> result = new HashSet<>();
-		for (CBRCurrency cbrCurrency : currencyList.getCurrencyList()) {
-			Currency currency = Currency.findByCode(cbrCurrency.getCharCode());
-			if (currency == null) {
-				log.debug("Currency with code '" + cbrCurrency.getCharCode() + "' not found in Currency enum");
-				continue;
+
+		try {
+			String xml = getXml();
+			CBRCurrencyList currencyList = parseCurrencyList(xml);
+
+			// CBR returns currency rates based on RUB
+			me.vgv.oncurrency.Currency baseCurrency = Currency.RUB;
+
+
+			for (CBRCurrency cbrCurrency : currencyList.getCurrencyList()) {
+				Currency currency = Currency.findByCode(cbrCurrency.getCharCode());
+				if (currency == null) {
+					log.debug("Currency with code '" + cbrCurrency.getCharCode() + "' not found in Currency enum");
+					continue;
+				}
+
+				double rate = cbrCurrency.getValue();
+				double nominal = cbrCurrency.getNominal();
+
+				CurrencyPair currencyPair = new CurrencyPair(baseCurrency, nominal, currency, rate);
+				result.add(currencyPair);
 			}
-
-			double rate = cbrCurrency.getValue();
-			double nominal = cbrCurrency.getNominal();
-
-			CurrencyPair currencyPair = new CurrencyPair(baseCurrency, nominal, currency, rate);
-			result.add(currencyPair);
+		} catch (Exception e) {
+			log.error("Can't fetch currency rates", e);
 		}
 
 		return result;
